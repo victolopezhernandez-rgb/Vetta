@@ -12,4 +12,8 @@ sensores (humedad de la tierra, temperatura y luz), asistente con IA y reconocim
 
 ## Versión publicada
 
-https://claude.ai/artifact/Gb12CjCVxhUgHjr8vkuyxk
+- Página web (GitHub Pages): https://victolopezhernandez-rgb.github.io/Vetta/
+- Artifact en claude.ai: https://claude.ai/artifact/Gb12CjCVxhUgHjr8vkuyxk
+
+En la página web, el asistente y el reconocimiento por foto usan OpenAI (`gpt-5.6-luna`):
+cada persona pega su API key en Ajustes → Inteligencia artificial y se guarda solo en su navegador.

@@ -1,3 +1,7 @@
+<!doctype html>
+<html lang="es">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Vetta</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -39,7 +43,7 @@
   --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 22px rgba(0,0,0,.28); color-scheme:dark}
 
 *{box-sizing:border-box}
-html,body{height:100%}
+html,body{height:100%;margin:0}
 body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:400;font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--head-bg)}
 button,input,textarea,select{font:inherit;color:inherit}
@@ -454,7 +458,7 @@ textarea.input{resize:vertical;min-height:84px}
 
 /* ───────── Configuración ───────── */
 const APP_NAME = "Vetta";
-const VERSION = "0.8.1 · versión de prueba";
+const VERSION = "0.9 · versión de prueba";
 const DAY = 864e5, HOUR = 36e5;
 const HARD_MAX_ML = 1000;            // límite del sistema por riego, independiente de la configuración
 const LS_KEY = "brote.v1", LS_PH = "brote.ph.", LS_THEME = "brote.theme";
@@ -713,7 +717,14 @@ function openaiAI(){
     const send=async body=>{
       let r;
       try{ r=await fetch("https://api.openai.com/v1/chat/completions",{method:"POST",headers:{"Authorization":"Bearer "+getAIKey(),"Content-Type":"application/json"},body:JSON.stringify(body),signal:opts.signal}); }
-      catch(e){ throw {code:e&&e.name==="AbortError"?"cancelled":"network"}; }
+      catch(e){
+        if(e&&e.name==="AbortError") throw {code:"cancelled"};
+        // OpenAI devuelve algunos errores sin permiso para el navegador: se averigua el motivo con una consulta simple
+        let code="network";
+        try{ const t=await fetch("https://api.openai.com/v1/models/"+AI_MODEL,{headers:{"Authorization":"Bearer "+getAIKey()}});
+          code=t.status===401?"bad_key":t.status===404?"bad_model":t.ok?(images.length?"image_rejected":"server"):"network"; }catch(e2){}
+        throw {code};
+      }
       const d=await r.json().catch(()=>({}));
       return {r,d,detail:String(d&&d.error&&d.error.message||"").slice(0,200)};
     };
@@ -1455,7 +1466,7 @@ function viewAsistente(){
   }
   const aiOff=R.sampleChecked&&!R.sample;
   if(aiOff){
-    html+=`<section class="card flat"><b style="font-weight:500">El chat con IA no está disponible en esta vista.</b><p class="small muted" style="margin-top:4px">Ábrela con tu cuenta de Claude o pega una API key de OpenAI en Ajustes para conversar con el asistente. Mientras tanto, las recomendaciones de cada planta funcionan igual.</p></section>`;
+    html+=`<section class="card flat"><b style="font-weight:500">El chat con IA no está disponible en esta vista.</b><p class="small muted" style="margin-top:4px">${window.claude?"Ábrela con tu cuenta de Claude o pega":"Pega"} una API key de OpenAI en Ajustes para conversar con el asistente. Mientras tanto, las recomendaciones de cada planta funcionan igual.</p></section>`;
   } else {
     html+=`<div class="msgs" id="msgs">`;
     if(!turns.length) html+=`<div class="msg ai">${p?`Hola. Puedo ayudarte con ${esc(p.name)} (${esc(SP(p.speciesId).name.toLowerCase())}). Cuéntame qué notas${R.imgOK?" o envíame una foto":""}.`:`Hola. Pregúntame lo que quieras sobre el cuidado de tus plantas.`}</div>`;
