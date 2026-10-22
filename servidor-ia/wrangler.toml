@@ -1,0 +1,14 @@
+name = "vetta-ia"
+main = "src/index.js"
+compatibility_date = "2025-09-01"
+
+[vars]
+# Modelo de texto de OpenAI. Si OpenAI responde "model not found", corrige el nombre aquí.
+MODEL = "gpt-5.6-luna"
+# Tope de palabras (tokens) por respuesta, para controlar el gasto.
+MAX_TOKENS = "2000"
+# Opcional: direcciones que pueden usar este servidor, separadas por coma. Vacío = cualquiera.
+ALLOWED_ORIGINS = ""
+
+# La API key NO va aquí. Se guarda como secreto:
+#   npx wrangler secret put OPENAI_API_KEY
